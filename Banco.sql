@@ -413,9 +413,10 @@ CREATE TABLE Transferencia(
 
 #------------- Usuario: admin -------------------
 
-/* 	Este usuario se utilizara para administrar la base de datos “banco” por lo tanto debera tener acceso total sobre todas las tablas, con la opcion de crear usuarios y otorgar privilegios sobre las mismas. Para no comprometer la seguridad se restringira que el acceso de este usuario se realice solo desde la maquina local donde se encuentra el servidor MySQL. El password de este usuario debera ser admin. */
-
-/*	CREATE USER 'userName'@'lugarDeConexion' IDENTIFIED BY 'password'; */
+/* 	Este usuario se utilizara para administrar la base de datos “banco” por lo tanto debera tener 
+acceso total sobre todas las tablas, con la opcion de crear usuarios y otorgar privilegios sobre las mismas. 
+Para no comprometer la seguridad se restringira que el acceso de este usuario se realice solo desde la maquina 
+local donde se encuentra el servidor MySQL. El password de este usuario debera ser admin. */
 
 CREATE USER 'admin'@'localhost' IDENTIFIED BY 'admin';
 
