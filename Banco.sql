@@ -190,6 +190,22 @@ CREATE TABLE Caja_Ahorro(
 
 ) ENGINE=InnoDB;
 
+CREATE TABLE Cliente_CA (
+	nro_cliente INT NOT NULL CHECK (nro_cliente > 0 AND nro_cliente <= 99999),
+	nro_ca INT NOT NULL CHECK (nro_ca > 0 AND nro_ca <= 99999999),
+
+	CONSTRAINT pk_Cliente_CA
+	PRIMARY KEY (nro_cliente, nro_ca),
+
+	CONSTRAINT fk_Cliente_CA_Cliente
+	FOREIGN KEY (nro_cliente) REFERENCES Cliente (nro_cliente)
+		ON DELETE RESTRICT ON UPDATE CASCADE,
+
+	CONSTRAINT fk_Cliente_CA_Caja_Ahorro
+	FOREIGN KEY (nro_ca) REFERENCES Caja_Ahorro (nro_ca)
+		ON DELETE RESTRICT ON UPDATE CASCADE
+
+) ENGINE=InnoDB;
 
 CREATE TABLE Tarjeta(
 	nro_tarjeta INT (16) NOT NULL CHECK(nro_tarjeta > 0 AND nro_tarjeta <= 9999999999999999), 
@@ -392,3 +408,54 @@ CREATE TABLE Transferencia(
 )ENGINE=InnoDB;
 
 
+#----------------------------------------------------------------------------------
+# Creacion de usuarios y asignacion de privilegios
+
+#------------- Usuario: admin -------------------
+
+/* 	Este usuario se utilizara para administrar la base de datos “banco” por lo tanto debera tener acceso total sobre todas las tablas, con la opcion de crear usuarios y otorgar privilegios sobre las mismas. Para no comprometer la seguridad se restringira que el acceso de este usuario se realice solo desde la maquina local donde se encuentra el servidor MySQL. El password de este usuario debera ser admin. */
+
+/*	CREATE USER 'userName'@'lugarDeConexion' IDENTIFIED BY 'password'; */
+
+CREATE USER 'admin'@'localhost' IDENTIFIED BY 'admin';
+
+GRANT ALL PRIVILEGES ON banco.* TO 'admin'@'localhost' WITH GRANT OPTION;
+
+#------------- Usuario: empleado -------------------
+
+/* Este usuario estara destinado a permitir el acceso de la aplicacion de administracion
+que utilizan los empleados del banco para administrar los clientes, prestamos, cajas de ahorro y
+plazos fijos. Para esto necesitara privilegios para:
+ 
+ *Solo realizar consultas sobre: Empleado, Sucursal, Tasa Plazo Fijo y Tasa Prestamo.
+ 
+ *Realizar consultas e ingresar datos sobre: Prestamo, Plazo Fijo, Plazo Cliente, Caja Ahorro y Tarjeta.
+ 
+ *Realizar consultas, ingresar y modificar datos sobre: Cliente CA, Cliente y Pago.
+ 
+Dado que el banco cuenta con varias sucursales distribuidas en diferentes ciudades, este usuario deber´a poder conectarse desde cualquier dominio. El password de este usuario deber´a ser
+empleado. Importante: Recuerde eliminar el usuario vacıo (drop user ’’@localhost) para
+poder conectarse con el usuario empleado desde localhost. */
+# 
+
+CREATE USER 'empleado'@'%' IDENTIFIED BY 'empleado';
+
+drop user ’’@localhost /*ESTA BIEN ASI? xd*/
+
+/* Consultas que puede hacer el empleado: */
+GRANT SELECT ON banco.Empleado TO 'empleado'@'%';
+GRANT SELECT ON banco.Sucursal TO 'empleado'@'%';
+GRANT SELECT ON banco.Tasa_Plazo_Fijo TO 'empleado'@'%';
+GRANT SELECT ON banco.Tasa_Prestamo TO 'empleado'@'%';
+
+/*Consultas e ingreso de datos que puede hacer el empelado:*/
+GRANT SELECT, INSERT ON banco.Prestamo TO 'empleado'@'%';
+GRANT SELECT, INSERT ON banco.Plazo_Fijo TO 'empleado'@'%';
+GRANT SELECT, INSERT ON banco.Plazo_Cliente TO 'empleado'@'%';
+GRANT SELECT, INSERT ON banco.Caja_Ahorro TO 'empleado'@'%';
+GRANT SELECT, INSERT ON banco.Tarjeta TO 'empleado'@'%';
+
+/*Consultas, ingreso y modificcacion de datos que puede hacer el empelado:*/
+GRANT SELECT, INSERT, UPDATE ON banco.Cliente_CA TO 'empleado'@'%';
+GRANT SELECT, INSERT, UPDATE ON banco.Cliente TO 'empleado'@'%';
+GRANT SELECT, INSERT, UPDATE ON banco.Pago TO 'empleado'@'%';
