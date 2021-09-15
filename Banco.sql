@@ -104,7 +104,7 @@ CREATE TABLE Tasa_Plazo_Fijo(
     CONSTRAINT pk_Tasa_Plazo_Fijo
 	    PRIMARY KEY (periodo, monto_inf, monto_sup)
 
-) ENGINE=INNODB;
+) ENGINE=InnoDB;
 
 
 CREATE TABLE Plazo_Cliente(
@@ -149,7 +149,7 @@ CREATE TABLE Prestamo(
 	FOREIGN KEY (nro_cliente) REFERENCES Cliente (nro_cliente)
 		ON DELETE RESTRICT ON UPDATE CASCADE
 
-) ENGINE=INNODB;
+) ENGINE=InnoDB;
 
 
 CREATE TABLE Pago(
