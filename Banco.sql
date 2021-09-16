@@ -23,7 +23,7 @@ CREATE TABLE Sucursal(
     telefono VARCHAR(45) NOT NULL, 
     horario VARCHAR(45) NOT NULL, 
     nombre VARCHAR(45) NOT NULL,
-    nro_suc INT NOT NULL CHECK (nro_suc > 0 AND nro_suc <= 999) NOT NULL,
+    nro_suc INT NOT NULL CHECK (nro_suc > 0 AND nro_suc <= 999),
     cod_postal INT(4) NOT NULL,
 
 	CONSTRAINT pk_Sucursal 
@@ -47,7 +47,7 @@ CREATE TABLE Empleado(
     telefono VARCHAR(45) NOT NULL,
     cargo VARCHAR(45) NOT NULL,
     password VARCHAR(32) NOT NULL,
-    nro_suc INT NOT NULL CHECK (nro_suc > 0 AND nro_suc <= 999) NOT NULL,
+    nro_suc INT NOT NULL,
 
    CONSTRAINT pk_Empleado 
 	PRIMARY KEY (legajo),
@@ -68,10 +68,9 @@ CREATE TABLE Cliente(
     direccion VARCHAR(45) NOT NULL,
     telefono VARCHAR(45) NOT NULL,
     fecha_nac DATE NOT NULL,
-    nro_cliente INT(8) NOT NULL,
-
-    CONSTRAINT pk_Cliente 
-	PRIMARY KEY (nro_cliente),
+   
+   CONSTRAINT pk_Cliente 
+	PRIMARY KEY (nro_cliente)
 
 ) ENGINE=InnoDB;
 
@@ -83,7 +82,7 @@ CREATE TABLE PlazoFijo(
     fecha_fin DATE NOT NULL,
     tasa_interes DECIMAL (X,2) NOT NULL,
     interes DECIMAL(X,2) NOT NULL,
-    nro_suc INT NOT NULL CHECK (nro_suc > 0 AND nro_suc <= 999) NOT NULL, 
+    nro_suc INT NOT NULL, 
 
    CONSTRAINT pk_PlazoFijo 
 	PRIMARY KEY (nro_plazo),
@@ -96,7 +95,7 @@ CREATE TABLE PlazoFijo(
 
 
 CREATE TABLE Tasa_Plazo_Fijo(
-    periodo INT NOT NULL CHECK (periodo > 0 AND periodo <= 999) NOT NULL,
+    periodo INT NOT NULL CHECK (periodo > 0 AND periodo <= 999),
     monto_inf DECIMAL(X,2) NOT NULL CHECK (monto_inf > 0), 
     monto_sup DECIMAL(X,2) NOT NULL CHECK (monto_sup>0),
     tasa DECIMAL(X,2) NOT NULL CHECK (tasa > 0),
@@ -109,8 +108,8 @@ CREATE TABLE Tasa_Plazo_Fijo(
 
 CREATE TABLE Plazo_Cliente(
 
-	nro_plazo INT NOT NULL CHECK (nro_plazo > 0 AND nro_plazo <= 99999999),
-	nro_cliente INT NOT NULL CHECK (nro_cliente > 0 AND nro_cliente <= 99999),
+	nro_plazo INT NOT NULL,
+	nro_cliente INT NOT NULL,
 	
 	CONSTRAINT pk_Plazo_Cliente
 	PRIMARY KEY (nro_plazo, nro_cliente),
@@ -135,8 +134,8 @@ CREATE TABLE Prestamo(
     tasa_interes DECIMAL(X,2) NOT NULL CHECK (tasa_interes > 0), 
     interes DECIMAL(X,2) NOT NULL CHECK (interes > 0), 
     valor_cuota DECIMAL(X,2) NOT NULL CHECK (valor_cuota > 0), 
-    legajo INT NOT NULL CHECK (legajo > 0 AND legajo <= 9999),
-    nro_cliente INT NOT NULL CHECK (nro_cliente > 0 AND nro_cliente <= 99999),
+    legajo INT NOT NULL,
+    nro_cliente INT NOT NULL,
 
    CONSTRAINT pk_Prestamo
 	PRIMARY KEY (nro_prestamo),
@@ -153,7 +152,7 @@ CREATE TABLE Prestamo(
 
 
 CREATE TABLE Pago(
-    nro_prestamo INT NOT NULL CHECK (nro_prestamo > 0 AND nro_prestamo <= 99999999),
+    nro_prestamo INT NOT NULL,
     nro_pago INT NOT NULL CHECK (nro_pago > 0 AND nro_pago <= 99),
     fecha_venc DATE NOT NULL,
     fecha_pago DATE NOT NULL,
@@ -169,7 +168,7 @@ CREATE TABLE Pago(
 
 
 CREATE TABLE Tasa_Prestamo(
-	periodo INT NOT NULL CHECK (periodo > 0 AND periodo <= 999) NOT NULL,
+	periodo INT NOT NULL CHECK (periodo > 0 AND periodo <= 999),
 	monto_inf DECIMAL(X,2) NOT NULL,
 	monto_sup DECIMAL(X,2) NOT NULL,
 	tasa DECIMAL(X,2) NOT NULL,
@@ -182,7 +181,7 @@ CREATE TABLE Tasa_Prestamo(
 
 CREATE TABLE Caja_Ahorro(
 	nro_ca INT NOT NULL CHECK (nro_ca > 0 AND nro_ca <= 99999999),
-	CBU INT NOT NULL CHECK (CBU > 99999999999999999 AND CBU <= 999999999999999999),
+	CBU BIGINT NOT NULL CHECK (CBU > 99999999999999999 AND CBU <= 999999999999999999),
 	saldo DECIMAL(X,2) NOT NULL,
 	
 	CONSTRAINT pk_Caja_Ahorro
@@ -191,8 +190,8 @@ CREATE TABLE Caja_Ahorro(
 ) ENGINE=InnoDB;
 
 CREATE TABLE Cliente_CA (
-	nro_cliente INT NOT NULL CHECK (nro_cliente > 0 AND nro_cliente <= 99999),
-	nro_ca INT NOT NULL CHECK (nro_ca > 0 AND nro_ca <= 99999999),
+	nro_cliente INT NOT NULL,
+	nro_ca INT NOT NULL,
 
 	CONSTRAINT pk_Cliente_CA
 	PRIMARY KEY (nro_cliente, nro_ca),
@@ -208,11 +207,11 @@ CREATE TABLE Cliente_CA (
 ) ENGINE=InnoDB;
 
 CREATE TABLE Tarjeta(
-	nro_tarjeta INT (16) NOT NULL CHECK(nro_tarjeta > 0 AND nro_tarjeta <= 9999999999999999), 
+	nro_tarjeta BIGINT (16) NOT NULL CHECK(nro_tarjeta > 0 AND nro_tarjeta <= 9999999999999999), 
 	MD5(PIN INT NOT NULL (32)), 
 	MD5(CVT INT NOT NULL (32)), 
-	nro_cliente INT NOT NULL CHECK (nro_cliente > 0 AND nro_cliente <= 99999), 
-	nro_ca INT NOT NULL CHECK (nro_ca > 0 AND nro_ca <= 99999999),
+	nro_cliente INT NOT NULL, 
+	nro_ca INT NOT NULL,
 	fecha_venc DATE NOT NULL,	
 	
 	CONSTRAINT pk_Tarjeta
@@ -235,12 +234,11 @@ CREATE TABLE Caja (
 	CONSTRAINT pk_Caja
 	PRIMARY KEY (cod_caja)
 	
-)ENGINE=InnoDB;
-
+)ENGINE=INNODB;
 
 
 CREATE TABLE ATM(
-	cod_caja INT (5) NOT NULL CHECK(cod_caja > 0 AND cod_caja <= 99999), 
+	cod_caja INT (5) NOT NULL, 
 	cod_postal INT(4) NOT NULL,
 	direccion VARCHAR(45) NOT NULL,
 	
@@ -260,8 +258,8 @@ CREATE TABLE ATM(
 
 
 CREATE TABLE Ventallia(
-	cod_caja INT (5) NOT NULL CHECK(cod_caja > 0 AND cod_caja <= 99999), 
-	nro_suc INT NOT NULL CHECK (nro_suc > 0 AND nro_suc <= 999) NOT NULL,
+	cod_caja INT (5) NOT NULL, 
+	nro_suc INT NOT NULL,
 
 	CONSTRAINT pk_Ventanilla
 	PRIMARY KEY (cod_caja),
@@ -291,8 +289,8 @@ CREATE TABLE Transaccion(
 
 
 CREATE TABLE Transaccion_por_caja(
-	nro_trans INT(10) NOT NULL CHECK(nro_trans > 0 AND nro_trans <= 9999999999), 
-	cod_caja INT (5) NOT NULL CHECK(cod_caja > 0 AND cod_caja <= 99999), 
+	nro_trans INT(10) NOT NULL, 
+	cod_caja INT (5) NOT NULL, 
 
 	CONSTRAINT pk_Transaccion_por_caja
 	PRIMARY KEY (nro_trans),
@@ -310,17 +308,17 @@ CREATE TABLE Transaccion_por_caja(
 
 
 CREATE TABLE Debito(
-	nro_trans INT(10) NOT NULL CHECK(nro_trans > 0 AND nro_trans <= 9999999999), 	
+	nro_trans INT(10) NOT NULL, 	
 	descripcion VARCHAR(45) NOT NULL, 
-	nro_cliente INT NOT NULL CHECK (nro_cliente > 0 AND nro_cliente <= 99999),
-	nro_ca INT NOT NULL CHECK (nro_ca > 0 AND nro_ca <= 99999999),
+	nro_cliente INT NOT NULL,
+	nro_ca INT NOT NULL,
 	
 	CONSTRAINT pk_Debito
 	PRIMARY KEY (nro_trans),
 	
 	CONSTRAINT FK_Debito_Transaccion
 	FOREIGN KEY (nro_trans) REFERENCES Transaccion (nro_trans)
-		ON DELETE RESTRICT ON UPDATE CASCADE
+		ON DELETE RESTRICT ON UPDATE CASCADE,
 		
 	CONSTRAINT FK_Debito_ClienteCA_Cliente
 	FOREIGN KEY (nro_cliente) REFERENCES Cliente_CA (nro_cliente)
@@ -335,8 +333,8 @@ CREATE TABLE Debito(
 
 
 CREATE TABLE Deposito(
-	nro_trans INT(10) NOT NULL CHECK(nro_trans > 0 AND nro_trans <= 9999999999), 
-	nro_ca INT NOT NULL CHECK (nro_ca > 0 AND nro_ca <= 99999999),
+	nro_trans INT(10) NOT NULL, 
+	nro_ca INT NOT NULL,
 	
 	CONSTRAINT pk_Deposito
 	PRIMARY KEY (nro_trans),
@@ -354,9 +352,9 @@ CREATE TABLE Deposito(
 
 
 CREATE TABLE Extraccion(
-	nro_trans INT(10) NOT NULL CHECK(nro_trans > 0 AND nro_trans <= 9999999999), 
-	nro_cliente INT NOT NULL CHECK (nro_cliente > 0 AND nro_cliente <= 99999),
-	nro_ca INT NOT NULL CHECK (nro_ca > 0 AND nro_ca <= 99999999),
+	nro_trans BIGINT(10) NOT NULL, 
+	nro_cliente INT NOT NULL,
+	nro_ca INT NOT NULL,
 		
 	CONSTRAINT pk_Extraccion
 	PRIMARY KEY (nro_trans),
@@ -378,10 +376,10 @@ CREATE TABLE Extraccion(
 
 
 CREATE TABLE Transferencia(
-	nro_trans INT(10) NOT NULL CHECK(nro_trans > 0 AND nro_trans <= 9999999999), 	
-	nro_cliente INT NOT NULL CHECK (nro_cliente > 0 AND nro_cliente <= 99999), 
-	origen_nroca INT NOT NULL CHECK (nro_ca > 0 AND nro_ca <= 99999999),
-	destino_nroca INT NOT NULL CHECK (nro_ca > 0 AND nro_ca <= 99999999),
+	nro_trans INT(10) NOT NULL, 	
+	nro_cliente INT NOT NULL, 
+	origen_nroca INT NOT NULL,
+	destino_nroca INT NOT NULL,
 	
 	CONSTRAINT pk_Transferencia
 	PRIMARY KEY (nro_trans),
