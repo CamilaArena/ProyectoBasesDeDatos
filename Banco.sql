@@ -77,11 +77,11 @@ CREATE TABLE Cliente(
 
 CREATE TABLE Plazo_Fijo(
     nro_plazo BIGINT NOT NULL CHECK (nro_plazo > 0 AND nro_plazo <= 99999999),
-    capital FLOAT NOT NULL CHECK (capital > 0),
+    capital DECIMAL (9,2) unsigned NOT NULL,
     fecha_inicio DATE NOT NULL,
     fecha_fin DATE NOT NULL,
     tasa_interes DECIMAL (4,2) unsigned NOT NULL,
-    interes DECIMAL(6,2) unsigned NOT NULL,
+	DECIMAL(6,2) unsigned NOT NULL,
     nro_suc INT NOT NULL, 
 
    CONSTRAINT pk_PlazoFijo 
@@ -98,7 +98,7 @@ CREATE TABLE Tasa_Plazo_Fijo(
     periodo SMALLINT NOT NULL CHECK (periodo > 0 AND periodo <= 999),
     monto_inf  DECIMAL(9,2) unsigned NOT NULL,
     monto_sup  DECIMAL(9,2) unsigned NOT NULL,
-    tasa  DECIMAL(4,2) unsigned CHECK(tasa>0) NOT NULL,
+    tasa DECIMAL(4,2) unsigned NOT NULL,
     
 
     CONSTRAINT pk_Tasa_Plazo_Fijo
@@ -197,11 +197,11 @@ CREATE TABLE Cliente_CA (
 	CONSTRAINT pk_Cliente_CA
 	PRIMARY KEY (nro_cliente, nro_ca),
 
-	CONSTRAINT fk_Cliente_CA_Cliente
+	CONSTRAINT FK_Cliente_CA_Cliente
 	FOREIGN KEY (nro_cliente) REFERENCES Cliente (nro_cliente)
 		ON DELETE RESTRICT ON UPDATE CASCADE,
 
-	CONSTRAINT fk_Cliente_CA_Caja_Ahorro
+	CONSTRAINT FK_Cliente_CA_Caja_Ahorro
 	FOREIGN KEY (nro_ca) REFERENCES Caja_Ahorro (nro_ca)
 		ON DELETE RESTRICT ON UPDATE CASCADE
 
@@ -209,8 +209,8 @@ CREATE TABLE Cliente_CA (
 
 CREATE TABLE Tarjeta(
 	nro_tarjeta BIGINT NOT NULL CHECK(nro_tarjeta > 0 AND nro_tarjeta <= 9999999999999999), 
-	PIN INT NOT NULL, 
-	CVT INT NOT NULL, 
+	PIN BIGINT NOT NULL CHECK(PIN > 0000000000000000000000000000000 AND PIN <= 99999999999999999999999999999999), 
+	CVT BIGINT NOT NULL CHECK(CVT > 0000000000000000000000000000000 AND CVT <= 99999999999999999999999999999999), , 
 	nro_cliente INT NOT NULL, 
 	nro_ca INT NOT NULL,
 	fecha_venc DATE NOT NULL,	
@@ -235,30 +235,10 @@ CREATE TABLE Caja (
 	CONSTRAINT pk_Caja
 	PRIMARY KEY (cod_caja)
 	
-)ENGINE=INNODB;
-
-
-CREATE TABLE ATM(
-	cod_caja INT NOT NULL, 
-	cod_postal INT NOT NULL,
-	direccion VARCHAR(45) NOT NULL,
-	
-	CONSTRAINT pk_ATM
-	PRIMARY KEY (cod_caja),
-	
-	CONSTRAINT FK_ATM_Caja
-	FOREIGN KEY (cod_caja) REFERENCES Caja (cod_caja)
-		ON DELETE RESTRICT ON UPDATE CASCADE,
-	
-	CONSTRAINT FK_ATM_Cicudad
-	FOREIGN KEY (cod_postal) REFERENCES Ciudad (cod_postal)
-		ON DELETE RESTRICT ON UPDATE CASCADE
-
 )ENGINE=InnoDB;
 
 
-
-CREATE TABLE Ventallia(
+CREATE TABLE Ventanilla(
 	cod_caja INT NOT NULL, 
 	nro_suc INT NOT NULL,
 
@@ -276,6 +256,24 @@ CREATE TABLE Ventallia(
 )ENGINE=InnoDB;
 
 
+CREATE TABLE ATM(
+	cod_caja INT NOT NULL, 
+	cod_postal INT NOT NULL,
+	direccion VARCHAR(45) NOT NULL,
+	
+	CONSTRAINT pk_ATM
+	PRIMARY KEY (cod_caja),
+	
+	CONSTRAINT FK_ATM_Caja
+	FOREIGN KEY (cod_caja) REFERENCES Caja (cod_caja)
+		ON DELETE RESTRICT ON UPDATE CASCADE,
+	
+	CONSTRAINT FK_ATM_Ciudad
+	FOREIGN KEY (cod_postal) REFERENCES Ciudad (cod_postal)
+		ON DELETE RESTRICT ON UPDATE CASCADE
+
+)ENGINE=InnoDB;
+
 
 CREATE TABLE Transaccion(
 	nro_trans INT NOT NULL CHECK(nro_trans > 0 AND nro_trans <= 9999999999), 
@@ -287,25 +285,6 @@ CREATE TABLE Transaccion(
 	PRIMARY KEY (nro_trans)
 
 )ENGINE=InnoDB;
-
-
-CREATE TABLE Transaccion_por_caja(
-	nro_trans INT NOT NULL, 
-	cod_caja INT NOT NULL, 
-
-	CONSTRAINT pk_Transaccion_por_caja
-	PRIMARY KEY (nro_trans),
-	
-	CONSTRAINT FK_TransPorCaja_Transaccion
-	FOREIGN KEY (nro_trans) REFERENCES Transaccion (nro_trans)
-		ON DELETE RESTRICT ON UPDATE CASCADE,	
-		
-	CONSTRAINT FK_TransPorCaja_Caja
-	FOREIGN KEY (cod_caja) REFERENCES Caja (cod_caja)
-		ON DELETE RESTRICT ON UPDATE CASCADE
-
-)ENGINE=InnoDB;
-
 
 
 CREATE TABLE Debito(
@@ -332,6 +311,24 @@ CREATE TABLE Debito(
 )ENGINE=InnoDB;
 
 
+CREATE TABLE Transaccion_por_caja(
+	nro_trans INT NOT NULL, 
+	cod_caja INT NOT NULL, 
+
+	CONSTRAINT pk_Transaccion_por_caja
+	PRIMARY KEY (nro_trans),
+	
+	CONSTRAINT FK_TransPorCaja_Transaccion
+	FOREIGN KEY (nro_trans) REFERENCES Transaccion (nro_trans)
+		ON DELETE RESTRICT ON UPDATE CASCADE,	
+		
+	CONSTRAINT FK_TransPorCaja_Caja
+	FOREIGN KEY (cod_caja) REFERENCES Caja (cod_caja)
+		ON DELETE RESTRICT ON UPDATE CASCADE
+
+)ENGINE=InnoDB;
+
+
 
 CREATE TABLE Deposito(
 	nro_trans INT NOT NULL, 
@@ -349,7 +346,6 @@ CREATE TABLE Deposito(
 		ON DELETE RESTRICT ON UPDATE CASCADE
 
 )ENGINE=InnoDB;
-
 
 
 CREATE TABLE Extraccion(
@@ -393,9 +389,7 @@ CREATE TABLE Transferencia(
 	FOREIGN KEY (nro_cliente) REFERENCES Cliente_CA (nro_cliente)
 		ON DELETE RESTRICT ON UPDATE CASCADE,
 	
-	
-	/*no se si referencia a la llave de la relacion Cliente_CA o si directamente va a Caja_de_ahorro*/
-	CONSTRAINT FK_Transferencia_Cliente_CA_Origen
+	CONSTRAINT FK_Transferencia_ClienteCA_Origen
 	FOREIGN KEY (origen_nroca) REFERENCES Cliente_CA (nro_ca)
 		ON DELETE RESTRICT ON UPDATE CASCADE, 
 	
@@ -421,7 +415,7 @@ CREATE USER 'admin'@'localhost' IDENTIFIED BY 'admin';
 
 GRANT ALL PRIVILEGES ON banco.* TO 'admin'@'localhost' WITH GRANT OPTION;
 
-DROP USER admin@localhost;
+DROP USER 'admin'@'localhost';
 
 /* Este usuario estara destinado a permitir el acceso de la aplicacion de administracion
 que utilizan los empleados del banco para administrar los clientes, prestamos, cajas de ahorro y
@@ -441,7 +435,7 @@ poder conectarse con el usuario empleado desde localhost. */
 DROP USER empleado;
 CREATE USER 'empleado'@'%' IDENTIFIED BY 'empleado';
 
-/*DROP USER ''@localhost;*/
+/*DROP USER ''@'localhost';*/
 
 /* Consultas que puede hacer el empleado: */
 GRANT SELECT ON banco.Empleado TO 'empleado'@'%';
@@ -493,7 +487,7 @@ debera poder conectarse desde cualquier dominio. El password de este usuario deb
 */
 
 CREATE USER 'atm'@'%' IDENTIFIED BY 'atm';
-DROP USER atm;
+DROP USER 'atm'@'%';
 
 GRANT SELECT ON banco.Transaccion_por_caja TO 'atm'@'%';
 GRANT SELECT, UPDATE ON banco.Tarjeta TO 'atm'@'%';
