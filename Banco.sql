@@ -23,7 +23,7 @@ CREATE TABLE Sucursal(
     telefono VARCHAR(45) NOT NULL, 
     horario VARCHAR(45) NOT NULL, 
     nombre VARCHAR(45) NOT NULL,
-    nro_suc INT NOT NULL CHECK (nro_suc > 0 AND nro_suc <= 999),
+    nro_suc SMALLINT NOT NULL CHECK (nro_suc > 0 AND nro_suc <= 999),
     cod_postal INT NOT NULL,
 
 	CONSTRAINT pk_Sucursal 
@@ -47,7 +47,7 @@ CREATE TABLE Empleado(
     telefono VARCHAR(45) NOT NULL,
     cargo VARCHAR(45) NOT NULL,
     password VARCHAR(32) NOT NULL,
-    nro_suc INT NOT NULL,
+    nro_suc SMALLINT NOT NULL,
 
    CONSTRAINT pk_Empleado 
 	PRIMARY KEY (legajo),
@@ -74,31 +74,31 @@ CREATE TABLE Cliente(
 
 ) ENGINE=InnoDB;
 
-
-CREATE TABLE Plazo_Fijo(
-    nro_plazo BIGINT NOT NULL CHECK (nro_plazo > 0 AND nro_plazo <= 99999999),
-    capital DECIMAL (9,2) unsigned NOT NULL,
-    fecha_inicio DATE NOT NULL,
-    fecha_fin DATE NOT NULL,
-    tasa_interes DECIMAL (4,2) unsigned NOT NULL,
-	DECIMAL(6,2) unsigned NOT NULL,
-    nro_suc INT NOT NULL, 
-
-   CONSTRAINT pk_PlazoFijo 
+CREATE TABLE Plazo_Fijo (
+	nro_plazo BIGINT NOT NULL CHECK (nro_plazo > 0 AND nro_plazo <= 99999999),
+	capital DECIMAL (9,2) UNSIGNED NOT NULL,
+	fecha_inicio DATE NOT NULL,
+	fecha_fin DATE NOT NULL,
+	tasa_interes DECIMAL (4,2) UNSIGNED NOT NULL,
+	interes DECIMAL (6,2) UNSIGNED NOT NULL,
+   nro_suc SMALLINT NOT NULL,
+	
+	CONSTRAINT pk_nro_plazo
 	PRIMARY KEY (nro_plazo),
-
-   CONSTRAINT FK_PlazoFijo_Sucursal
-   FOREIGN KEY (nro_suc) REFERENCES Sucursal (nro_suc)
-        ON DELETE RESTRICT ON UPDATE CASCADE
-
+	
+	CONSTRAINT fk_Plazo_Fijo_NroSuc
+	FOREIGN KEY (nro_suc) REFERENCES Sucursal(nro_suc)
+		ON DELETE RESTRICT ON UPDATE CASCADE 
+	
+		 
 ) ENGINE=InnoDB;
 
 
 CREATE TABLE Tasa_Plazo_Fijo(
     periodo SMALLINT NOT NULL CHECK (periodo > 0 AND periodo <= 999),
-    monto_inf  DECIMAL(9,2) unsigned NOT NULL,
-    monto_sup  DECIMAL(9,2) unsigned NOT NULL,
-    tasa DECIMAL(4,2) unsigned NOT NULL,
+    monto_inf  DECIMAL(9,2) UNSIGNED NOT NULL,
+    monto_sup  DECIMAL(9,2) UNSIGNED NOT NULL,
+    tasa DECIMAL(4,2) UNSIGNED NOT NULL,
     
 
     CONSTRAINT pk_Tasa_Plazo_Fijo
@@ -131,10 +131,10 @@ CREATE TABLE Prestamo(
     nro_prestamo BIGINT NOT NULL CHECK (nro_prestamo > 0 AND nro_prestamo <= 99999999),   
     fecha DATE NOT NULL,
     cant_meses SMALLINT NOT NULL CHECK (cant_meses > 0 AND cant_meses <= 99),
-    monto  DECIMAL(9,2) unsigned NOT NULL, 
-    tasa_interes  DECIMAL(4,2) unsigned NOT NULL, 
-    interes  DECIMAL(6,2) unsigned NOT NULL, 
-    valor_cuota  DECIMAL(7,2) unsigned NOT NULL, 
+    monto  DECIMAL(9,2) UNSIGNED NOT NULL, 
+    tasa_interes  DECIMAL(4,2) UNSIGNED NOT NULL, 
+    interes  DECIMAL(6,2) UNSIGNED NOT NULL, 
+    valor_cuota  DECIMAL(7,2) UNSIGNED NOT NULL, 
     legajo INT NOT NULL,
     nro_cliente INT NOT NULL,
 
@@ -170,9 +170,9 @@ CREATE TABLE Pago(
 
 CREATE TABLE Tasa_Prestamo(
 	periodo SMALLINT NOT NULL CHECK (periodo > 0 AND periodo <= 999),
-	monto_inf  DECIMAL(9,2) unsigned NOT NULL,
-	monto_sup  DECIMAL(9,2) unsigned NOT NULL,
-	tasa  DECIMAL(4,2) unsigned NOT NULL,
+	monto_inf  DECIMAL(9,2) UNSIGNED NOT NULL,
+	monto_sup  DECIMAL(9,2) UNSIGNED NOT NULL,
+	tasa  DECIMAL(4,2) UNSIGNED NOT NULL,
 	
 	CONSTRAINT pk_Tasa_Prestamo
 	PRIMARY KEY (periodo, monto_inf, monto_sup)
@@ -183,7 +183,7 @@ CREATE TABLE Tasa_Prestamo(
 CREATE TABLE Caja_Ahorro(
 	nro_ca INT NOT NULL CHECK (nro_ca > 0 AND nro_ca <= 99999999),
 	CBU BIGINT NOT NULL CHECK (CBU > 99999999999999999 AND CBU <= 999999999999999999),
-	saldo DECIMAL(10,2) unsigned NOT NULL,
+	saldo DECIMAL(10,2) UNSIGNED NOT NULL,
 	
 	CONSTRAINT pk_Caja_Ahorro
 	PRIMARY KEY (nro_ca)
@@ -210,7 +210,7 @@ CREATE TABLE Cliente_CA (
 CREATE TABLE Tarjeta(
 	nro_tarjeta BIGINT NOT NULL CHECK(nro_tarjeta > 0 AND nro_tarjeta <= 9999999999999999), 
 	PIN BIGINT NOT NULL CHECK(PIN > 0000000000000000000000000000000 AND PIN <= 99999999999999999999999999999999), 
-	CVT BIGINT NOT NULL CHECK(CVT > 0000000000000000000000000000000 AND CVT <= 99999999999999999999999999999999), , 
+	CVT BIGINT NOT NULL CHECK(CVT > 0000000000000000000000000000000 AND CVT <= 99999999999999999999999999999999),  
 	nro_cliente INT NOT NULL, 
 	nro_ca INT NOT NULL,
 	fecha_venc DATE NOT NULL,	
@@ -240,7 +240,7 @@ CREATE TABLE Caja (
 
 CREATE TABLE Ventanilla(
 	cod_caja INT NOT NULL, 
-	nro_suc INT NOT NULL,
+	nro_suc SMALLINT NOT NULL,
 
 	CONSTRAINT pk_Ventanilla
 	PRIMARY KEY (cod_caja),
@@ -279,7 +279,7 @@ CREATE TABLE Transaccion(
 	nro_trans INT NOT NULL CHECK(nro_trans > 0 AND nro_trans <= 9999999999), 
 	fecha DATE NOT NULL, 
 	hora TIME NOT NULL, 
-	monto  DECIMAL(9,2) unsigned NOT NULL,
+	monto  DECIMAL(9,2) UNSIGNED NOT NULL,
 	
 	CONSTRAINT pk_Transaccion
 	PRIMARY KEY (nro_trans)
@@ -404,12 +404,8 @@ CREATE TABLE Transferencia(
 #----------------------------------------------------------------------------------
 # Creacion de usuarios y asignacion de privilegios
 
-#------------- Usuario: admin -------------------
+/*----------------------USER ADMIN-------------------------*/
 
-/* 	Este usuario se utilizara para administrar la base de datos “banco” por lo tanto debera tener 
-acceso total sobre todas las tablas, con la opcion de crear usuarios y otorgar privilegios sobre las mismas. 
-Para no comprometer la seguridad se restringira que el acceso de este usuario se realice solo desde la maquina 
-local donde se encuentra el servidor MySQL. El password de este usuario debera ser admin. */
 
 CREATE USER 'admin'@'localhost' IDENTIFIED BY 'admin';
 
@@ -417,25 +413,11 @@ GRANT ALL PRIVILEGES ON banco.* TO 'admin'@'localhost' WITH GRANT OPTION;
 
 DROP USER 'admin'@'localhost';
 
-/* Este usuario estara destinado a permitir el acceso de la aplicacion de administracion
-que utilizan los empleados del banco para administrar los clientes, prestamos, cajas de ahorro y
-plazos fijos. Para esto necesitara privilegios para:
- 
- *Solo realizar consultas sobre: Empleado, Sucursal, Tasa Plazo Fijo y Tasa Prestamo.
- 
- *Realizar consultas e ingresar datos sobre: Prestamo, Plazo Fijo, Plazo Cliente, Caja Ahorro y Tarjeta.
- 
- *Realizar consultas, ingresar y modificar datos sobre: Cliente CA, Cliente y Pago.
- 
-Dado que el banco cuenta con varias sucursales distribuidas en diferentes ciudades, este usuario deber´a poder conectarse desde cualquier dominio. El password de este usuario deber´a ser
-empleado. Importante: Recuerde eliminar el usuario vacıo (drop user ’’@localhost) para
-poder conectarse con el usuario empleado desde localhost. */
-# 
+/*----------------------USER EMPLEADO-------------------------*/
 
 DROP USER empleado;
+DROP USER ''@'localhost';
 CREATE USER 'empleado'@'%' IDENTIFIED BY 'empleado';
-
-/*DROP USER ''@'localhost';*/
 
 /* Consultas que puede hacer el empleado: */
 GRANT SELECT ON banco.Empleado TO 'empleado'@'%';
@@ -445,7 +427,7 @@ GRANT SELECT ON banco.Tasa_Prestamo TO 'empleado'@'%';
 
 /*Consultas e ingreso de datos que puede hacer el empelado:*/
 GRANT SELECT, INSERT ON banco.Prestamo TO 'empleado'@'%';
-GRANT SELECT, INSERT ON banco.Plazo_Fijo TO 'empleado'@'%';
+GRANT SELECT, INSERT ON plazo_fijobanco.Plazo_Fijo TO 'empleado'@'%';
 GRANT SELECT, INSERT ON banco.Plazo_Cliente TO 'empleado'@'%';
 GRANT SELECT, INSERT ON banco.Caja_Ahorro TO 'empleado'@'%';
 GRANT SELECT, INSERT ON banco.Tarjeta TO 'empleado'@'%';
@@ -456,35 +438,7 @@ GRANT SELECT, INSERT, UPDATE ON banco.Cliente TO 'empleado'@'%';
 GRANT SELECT, INSERT, UPDATE ON banco.Pago TO 'empleado'@'%';
 
 
-#------------- Usuario: atm -------------------
-
-/*
-atm: Este usuario esta destinado a permitir el acceso de los ATM, para que los clientes puedan
-consultar el estado de sus cajas de ahorro y realizar transacciones. Con el objetivo de ocultar
-la estructura de la base de datos, el usuario atm tendra una vision restringida de la misma que
-solamente le permita ver informacion relacionada a las transacciones realizadas sobre las cajas
-de ahorro. A tal efecto, se debera crear una vista con el nombre trans cajas ahorro que contenga
-la siguiente informacion:
-
-	*Numero (nro ca) y saldo de cada caja de ahorro.
-
-	*Numero (nro trans), fecha, hora, tipo (debito, extraccion, transferencia, deposito) y monto
-de cada transaccion realizada sobre cada caja de ahorro. En caso que la transaccion sea
-una transferencia la vista debera contener el numero de la caja de ahorro destino. Ademas,
-debera contener el codigo de la caja (cod caja) donde fue realizada la transaccion (salvo
-que sea un debito).
-
-	*Numero de cliente, tipo y numero de documento, nombre y apellido del cliente que realizo
-cada transaccion (solo para debito, extraccion y transferencia).
-
-El usuario atm tendra privilegio de lectura sobre la vista trans cajas ahorro. 
-
-Ademas este usuario debera tener permiso de lectura y actualizacion sobre la tabla tarjeta (ver apendice A) para
-poder controlar el ingreso de los clientes a los ATM y permitir que cambien el PIN de su tarjeta.
-
-Dado que los cajeros automaticos se encuentran distribuidos en diferentes ciudades, este usuario
-debera poder conectarse desde cualquier dominio. El password de este usuario debera ser atm.
-*/
+/*----------------------USER ATM-------------------------*/
 
 CREATE USER 'atm'@'%' IDENTIFIED BY 'atm';
 DROP USER 'atm'@'%';
