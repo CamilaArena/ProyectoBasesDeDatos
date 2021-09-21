@@ -1,10 +1,10 @@
 # Creo de la Base de Datos
 DROP DATABASE banco; 
-/*drop user admin@localhost;
+drop user admin@localhost;
 
 drop user empleado;
 
-drop user atm;*/
+drop user atm;
 
 CREATE DATABASE banco;
 
@@ -45,7 +45,7 @@ CREATE TABLE Sucursal(
 
 
 CREATE TABLE Empleado(
-   legajo INT UNSIGNED NOT NULL AUTO_INCREMENT CHECK (legajo > 0 AND legajo <= 9999),
+   legajo INT UNSIGNED NOT NULL AUTO_INCREMENT,
    apellido VARCHAR(45) NOT NULL,
    nombre VARCHAR(45) NOT NULL,
    tipo_doc VARCHAR(20) NOT NULL,
@@ -54,7 +54,7 @@ CREATE TABLE Empleado(
    telefono VARCHAR(45) NOT NULL,
    cargo VARCHAR(45) NOT NULL,
    password VARCHAR(32) NOT NULL,
-   nro_suc SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+   nro_suc SMALLINT UNSIGNED NOT NULL,
 
    CONSTRAINT pk_Empleado 
 	PRIMARY KEY (legajo),
@@ -67,7 +67,7 @@ CREATE TABLE Empleado(
 
 
 CREATE TABLE Cliente(
-   nro_cliente INT UNSIGNED NOT NULL AUTO_INCREMENT CHECK (nro_cliente > 0 AND nro_cliente <= 99999),
+   nro_cliente INT UNSIGNED NOT NULL AUTO_INCREMENT,
    apellido VARCHAR(45) NOT NULL,
    nombre VARCHAR(45) NOT NULL,
    tipo_doc VARCHAR(20) NOT NULL,
@@ -82,7 +82,7 @@ CREATE TABLE Cliente(
 ) ENGINE=InnoDB;
 
 CREATE TABLE Plazo_Fijo (
-	nro_plazo BIGINT UNSIGNED NOT NULL AUTO_INCREMENT CHECK (nro_plazo > 0 AND nro_plazo <= 99999999),
+	nro_plazo BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 	capital DECIMAL (16,2) UNSIGNED NOT NULL,
 	fecha_inicio DATE NOT NULL,
 	fecha_fin DATE NOT NULL,
@@ -116,8 +116,8 @@ CREATE TABLE Tasa_Plazo_Fijo(
 
 CREATE TABLE Plazo_Cliente(
 
-	nro_plazo BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-	nro_cliente INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	nro_plazo BIGINT UNSIGNED NOT NULL,
+	nro_cliente INT UNSIGNED NOT NULL,
 	
 	CONSTRAINT pk_Plazo_Cliente
 	PRIMARY KEY (nro_plazo, nro_cliente),
@@ -135,15 +135,15 @@ CREATE TABLE Plazo_Cliente(
 
 
 CREATE TABLE Prestamo(
-   nro_prestamo BIGINT UNSIGNED NOT NULL CHECK (nro_prestamo > 0 AND nro_prestamo <= 99999999),   
+   nro_prestamo BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
    fecha DATE NOT NULL,
    cant_meses SMALLINT UNSIGNED NOT NULL CHECK (cant_meses > 0 AND cant_meses <= 99),
    monto DECIMAL(10,2) UNSIGNED NOT NULL, 
    tasa_interes  DECIMAL(4,2) UNSIGNED NOT NULL, 
    interes DECIMAL(9,2) UNSIGNED NOT NULL, 
    valor_cuota  DECIMAL(9,2) UNSIGNED NOT NULL, 
-   legajo INT UNSIGNED NOT NULL AUTO_INCREMENT,
-   nro_cliente INT UNSIGNED NOT NULL AUTO_INCREMENT,
+   legajo INT UNSIGNED NOT NULL,
+   nro_cliente INT UNSIGNED NOT NULL,
 
    CONSTRAINT pk_Prestamo
 	PRIMARY KEY (nro_prestamo),
@@ -188,7 +188,7 @@ CREATE TABLE Tasa_Prestamo(
 
 
 CREATE TABLE Caja_Ahorro(
-	nro_ca INT UNSIGNED NOT NULL AUTO_INCREMENT CHECK (nro_ca > 0 AND nro_ca <= 99999999),
+	nro_ca INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	CBU BIGINT UNSIGNED NOT NULL CHECK (CBU > 0 AND CBU <= 999999999999999999),
 	saldo DECIMAL(16,2) UNSIGNED NOT NULL,
 	
@@ -198,8 +198,8 @@ CREATE TABLE Caja_Ahorro(
 ) ENGINE=InnoDB;
 
 CREATE TABLE Cliente_CA (
-	nro_cliente INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	nro_ca INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	nro_cliente INT UNSIGNED NOT NULL,
+	nro_ca INT UNSIGNED NOT NULL,
 
 	CONSTRAINT pk_Cliente_CA
 	PRIMARY KEY (nro_cliente, nro_ca),
@@ -215,12 +215,12 @@ CREATE TABLE Cliente_CA (
 ) ENGINE=InnoDB;
 
 CREATE TABLE Tarjeta(
-	nro_tarjeta BIGINT UNSIGNED NOT NULL CHECK(nro_tarjeta > 0 AND nro_tarjeta <= 9999999999999999), 
+	nro_tarjeta BIGINT UNSIGNED NOT NULL AUTO_INCREMENT, 
 	PIN CHAR(32) NOT NULL, 
 	CVT CHAR(32) NOT NULL, 
 	fecha_venc DATE NOT NULL,	
-	nro_cliente INT UNSIGNED NOT NULL AUTO_INCREMENT, 
-	nro_ca INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	nro_cliente INT UNSIGNED NOT NULL, 
+	nro_ca INT UNSIGNED NOT NULL,
 	
 	CONSTRAINT pk_Tarjeta
 	PRIMARY KEY (nro_tarjeta),
@@ -237,7 +237,7 @@ CREATE TABLE Tarjeta(
 
 
 CREATE TABLE Caja (
-	cod_caja INT UNSIGNED NOT NULL AUTO_INCREMENT CHECK(cod_caja > 0 AND cod_caja <= 99999), 
+	cod_caja INT UNSIGNED NOT NULL AUTO_INCREMENT, 
 	
 	CONSTRAINT pk_Caja
 	PRIMARY KEY (cod_caja)
@@ -264,7 +264,7 @@ CREATE TABLE Ventanilla(
 
 
 CREATE TABLE ATM(
-	cod_caja INT UNSIGNED NOT NULL AUTO_INCREMENT, 
+	cod_caja INT UNSIGNED NOT NULL, 
 	cod_postal INT UNSIGNED NOT NULL,
 	direccion VARCHAR(45) NOT NULL,
 	
@@ -283,7 +283,7 @@ CREATE TABLE ATM(
 
 
 CREATE TABLE Transaccion(
-	nro_trans BIGINT UNSIGNED NOT NULL AUTO_INCREMENT CHECK(nro_trans > 0 AND nro_trans <= 9999999999), 
+	nro_trans BIGINT UNSIGNED NOT NULL AUTO_INCREMENT, 
 	fecha DATE NOT NULL, 
 	hora TIME NOT NULL, 
 	monto DECIMAL(16,2) UNSIGNED NOT NULL,
@@ -295,10 +295,10 @@ CREATE TABLE Transaccion(
 
 
 CREATE TABLE Debito(
-	nro_trans BIGINT UNSIGNED NOT NULL AUTO_INCREMENT, 	
+	nro_trans BIGINT UNSIGNED NOT NULL, 	
 	descripcion TINYTEXT, 
-	nro_cliente INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	nro_ca INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	nro_cliente INT UNSIGNED NOT NULL,
+	nro_ca INT UNSIGNED NOT NULL,
 	
 	CONSTRAINT pk_Debito
 	PRIMARY KEY (nro_trans),
@@ -319,7 +319,7 @@ CREATE TABLE Debito(
 
 
 CREATE TABLE Transaccion_por_caja(
-	nro_trans BIGINT UNSIGNED NOT NULL AUTO_INCREMENT, 
+	nro_trans BIGINT UNSIGNED NOT NULL, 
 	cod_caja INT UNSIGNED NOT NULL, 
 
 	CONSTRAINT pk_Transaccion_por_caja
@@ -338,8 +338,8 @@ CREATE TABLE Transaccion_por_caja(
 
 
 CREATE TABLE deposito(
-	nro_trans BIGINT UNSIGNED NOT NULL AUTO_INCREMENT, 
-	nro_ca INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	nro_trans BIGINT UNSIGNED NOT NULL, 
+	nro_ca INT UNSIGNED NOT NULL,
 	
 	CONSTRAINT pk_Deposito
 	PRIMARY KEY (nro_trans),
@@ -356,9 +356,9 @@ CREATE TABLE deposito(
 
 
 CREATE TABLE Extraccion(
-	nro_trans BIGINT UNSIGNED  NOT NULL AUTO_INCREMENT, 
-	nro_cliente INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	nro_ca INT UNSIGNED UNSIGNED NOT NULL AUTO_INCREMENT,
+	nro_trans BIGINT UNSIGNED  NOT NULL, 
+	nro_cliente INT UNSIGNED NOT NULL,
+	nro_ca INT UNSIGNED UNSIGNED NOT NULL,
 		
 	CONSTRAINT pk_Extraccion
 	PRIMARY KEY (nro_trans),
@@ -380,10 +380,10 @@ CREATE TABLE Extraccion(
 
 
 CREATE TABLE Transferencia(
-	nro_trans BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,  	
-	nro_cliente INT UNSIGNED NOT NULL AUTO_INCREMENT, 
-	origen_nroca INT UNSIGNED NOT NULL,
-	destino_nroca INT UNSIGNED NOT NULL,
+	nro_trans BIGINT UNSIGNED NOT NULL,  	
+	nro_cliente INT UNSIGNED NOT NULL, 
+	origen INT UNSIGNED NOT NULL,
+	destino INT UNSIGNED NOT NULL,
 	
 	CONSTRAINT pk_Transferencia
 	PRIMARY KEY (nro_trans),
@@ -397,11 +397,11 @@ CREATE TABLE Transferencia(
 		ON DELETE RESTRICT ON UPDATE CASCADE,
 	
 	CONSTRAINT FK_Transferencia_ClienteCA_Origen
-	FOREIGN KEY (origen_nroca) REFERENCES Cliente_CA (nro_ca)
+	FOREIGN KEY (origen) REFERENCES Cliente_CA (nro_ca)
 		ON DELETE RESTRICT ON UPDATE CASCADE, 
 	
 	CONSTRAINT FK_Transferencia_CA_Destino
-	FOREIGN KEY (destino_nroca) REFERENCES Caja_Ahorro (nro_ca)
+	FOREIGN KEY (destino) REFERENCES Caja_Ahorro (nro_ca)
 		ON DELETE RESTRICT ON UPDATE CASCADE	
 		
 
