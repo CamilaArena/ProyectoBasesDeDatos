@@ -1,16 +1,16 @@
 # Creo de la Base de Datos
-DROP DATABASE banco; 
-drop user admin@localhost;
+/*DROP DATABASE banco;
+/*drop user admin@localhost;
 
 drop user empleado;
 
 drop user atm;
-
+*/
 CREATE DATABASE banco;
-
 
 # selecciono la base de datos
 USE banco;
+
 
 #-------------------------------------------------------------------------
 # Creacion Tablas para las entidades
@@ -20,7 +20,7 @@ CREATE TABLE Ciudad (
    nombre VARCHAR(45) NOT NULL, 
     
    CONSTRAINT pk_Ciudad 
-    PRIMARY KEY (cod_postal)
+    PRIMARY KEY (cod_postal)	
 
 ) ENGINE=InnoDB;
 
@@ -226,13 +226,9 @@ CREATE TABLE Tarjeta(
 	PRIMARY KEY (nro_tarjeta),
 	
 	CONSTRAINT FK_Tarjeta_Cliente
-	FOREIGN KEY (nro_cliente) REFERENCES Cliente (nro_cliente)
-		ON DELETE RESTRICT ON UPDATE CASCADE,
-	
-	CONSTRAINT FK_Tarjeta_Caja_Ahorro
-	FOREIGN KEY (nro_ca) REFERENCES Caja_Ahorro (nro_ca)
+	FOREIGN KEY (nro_cliente, nro_ca) REFERENCES Cliente_Ca (nro_cliente, nro_ca)
 		ON DELETE RESTRICT ON UPDATE CASCADE
-
+		
 )ENGINE=InnoDB;
 
 
@@ -308,11 +304,7 @@ CREATE TABLE Debito(
 		ON DELETE RESTRICT ON UPDATE CASCADE,
 		
 	CONSTRAINT FK_Debito_ClienteCA_Cliente
-	FOREIGN KEY (nro_cliente) REFERENCES Cliente_CA (nro_cliente)
-		ON DELETE RESTRICT ON UPDATE CASCADE,
-	
-	CONSTRAINT FK_Debito_ClienteCA_CA
-	FOREIGN KEY (nro_ca) REFERENCES Cliente_CA (nro_ca)
+	FOREIGN KEY (nro_cliente, nro_ca) REFERENCES Cliente_CA (nro_cliente, nro_ca)
 		ON DELETE RESTRICT ON UPDATE CASCADE
 
 )ENGINE=InnoDB;
@@ -368,11 +360,7 @@ CREATE TABLE Extraccion(
 		ON DELETE RESTRICT ON UPDATE CASCADE, 
 		
 	CONSTRAINT FK_Extraccion_ClienteCA_Cliente
-	FOREIGN KEY (nro_cliente) REFERENCES Cliente_CA (nro_cliente)
-		ON DELETE RESTRICT ON UPDATE CASCADE,
-	
-	CONSTRAINT FK_Extraccion_ClienteCA_CA
-	FOREIGN KEY (nro_ca) REFERENCES Cliente_CA (nro_ca)
+	FOREIGN KEY (nro_cliente, nro_ca) REFERENCES Cliente_CA (nro_cliente, nro_ca)
 		ON DELETE RESTRICT ON UPDATE CASCADE
 
 )ENGINE=InnoDB;
@@ -393,12 +381,8 @@ CREATE TABLE Transferencia(
 		ON DELETE RESTRICT ON UPDATE CASCADE, 
 	
 	CONSTRAINT FK_Transferencia_ClienteCA_Cliente
-	FOREIGN KEY (nro_cliente) REFERENCES Cliente_CA (nro_cliente)
+	FOREIGN KEY (nro_cliente, origen) REFERENCES Cliente_CA (nro_cliente, nro_ca)
 		ON DELETE RESTRICT ON UPDATE CASCADE,
-	
-	CONSTRAINT FK_Transferencia_ClienteCA_Origen
-	FOREIGN KEY (origen) REFERENCES Cliente_CA (nro_ca)
-		ON DELETE RESTRICT ON UPDATE CASCADE, 
 	
 	CONSTRAINT FK_Transferencia_CA_Destino
 	FOREIGN KEY (destino) REFERENCES Caja_Ahorro (nro_ca)
@@ -423,7 +407,7 @@ GRANT ALL PRIVILEGES ON banco.* TO 'admin'@'localhost' WITH GRANT OPTION;
 /*----------------------USER EMPLEADO-------------------------*/
 
 /*DROP USER empleado;*/
-/*DROP USER ''@'localhost';*/
+DROP USER ''@'localhost';
 CREATE USER 'empleado'@'%' IDENTIFIED BY 'empleado';
 
 /* Consultas que puede hacer el empleado: */
@@ -453,8 +437,6 @@ CREATE USER 'atm'@'%' IDENTIFIED BY 'atm';
 GRANT SELECT ON banco.Transaccion_por_caja TO 'atm'@'%';
 GRANT SELECT, UPDATE ON banco.Tarjeta TO 'atm'@'%';
 /*GRANT SELECT ON banco.trans_cajas_ahorro TO 'atm'@'%';*/
-
-
 
 
 
