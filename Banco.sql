@@ -1,11 +1,16 @@
 # Creo de la Base de Datos
-/*DROP DATABASE banco;
-/*drop user admin@localhost;
+
+DROP DATABASE banco;
+
+
+drop user admin@localhost;
 
 drop user empleado;
 
 drop user atm;
-*/
+/*
+drop user ''@localhost;*/
+
 CREATE DATABASE banco;
 
 # selecciono la base de datos
@@ -303,9 +308,10 @@ CREATE TABLE Debito(
 	FOREIGN KEY (nro_trans) REFERENCES Transaccion (nro_trans)
 		ON DELETE RESTRICT ON UPDATE CASCADE,
 		
-	CONSTRAINT FK_Debito_ClienteCA_Cliente
+	CONSTRAINT FK_Debito_ClienteCA_ClienteYCA
 	FOREIGN KEY (nro_cliente, nro_ca) REFERENCES Cliente_CA (nro_cliente, nro_ca)
 		ON DELETE RESTRICT ON UPDATE CASCADE
+
 
 )ENGINE=InnoDB;
 
@@ -329,7 +335,7 @@ CREATE TABLE Transaccion_por_caja(
 
 
 
-CREATE TABLE deposito(
+CREATE TABLE Deposito(
 	nro_trans BIGINT UNSIGNED NOT NULL, 
 	nro_ca INT UNSIGNED NOT NULL,
 	
@@ -391,8 +397,46 @@ CREATE TABLE Transferencia(
 
 )ENGINE=InnoDB;
 
-
-
+CREATE VIEW trans_cajas_ahorro AS
+	(SELECT DISTINCT deb.nro_ca, saldo, deb.nro_trans, fecha, hora, 'debito' AS tipo, monto, NULL AS cod_caja, deb.nro_cliente, tipo_doc, nro_doc, nombre, apellido, 
+						NULL AS destino
+	FROM ((((Debito deb JOIN Transaccion trans ON deb.nro_trans = trans.nro_trans) 
+				JOIN Cliente_ca clienteca ON clienteca.nro_ca = deb.nro_ca)
+				JOIN Cliente cl ON cl.nro_cliente = deb.nro_cliente)
+				JOIN Caja_ahorro ca ON ca.nro_ca = clienteca.nro_ca))
+	
+					
+	UNION
+	
+	(SELECT DISTINCT dep.nro_ca, saldo, dep.nro_trans, fecha, hora, 'deposito' AS tipo, monto, ca.cod_caja, NULL as nro_cliente, NULL as tipo_doc, NULL as nro_doc, 
+							NULL as nombre, NULL as apellido, NULL AS destino
+	FROM ((((Deposito dep JOIN Transaccion_por_caja transcaja ON dep.nro_trans = transcaja.nro_trans) 
+				JOIN Transaccion trans ON transcaja.nro_trans = trans.nro_trans)
+				JOIN Caja_ahorro caahorro ON caahorro.nro_ca = dep.nro_ca)
+				JOIN Caja ca ON ca.cod_caja = transcaja.cod_caja))
+	
+	UNION
+	(SELECT DISTINCT extra.nro_ca, caahorro.saldo, extra.nro_trans, fecha, hora, 'extraccion' AS tipo, monto, ca.cod_caja, extra.nro_cliente, tipo_doc, nro_doc, nombre, apellido, 
+							NULL AS destino
+	FROM ((((((Extraccion extra JOIN Transaccion_por_caja transcaja ON extra.nro_trans = transcaja.nro_trans) 
+				JOIN Transaccion trans ON transcaja.nro_trans = trans.nro_trans)
+				JOIN Cliente_ca clienteca ON clienteca.nro_ca = extra.nro_ca AND clienteca.nro_cliente = extra.nro_cliente)
+				JOIN Caja ca ON ca.cod_caja = transcaja.cod_caja)
+				JOIN Cliente cl ON cl.nro_cliente = extra.nro_cliente)
+				JOIN caja_ahorro caahorro ON clienteca.nro_ca = caahorro.nro_ca))
+	
+	UNION 
+				
+	(SELECT DISTINCT clienteca.nro_ca, caahorro.saldo, transfer.nro_trans, fecha, hora, 'transferencia' AS tipo, monto, ca.cod_caja, transfer.nro_cliente, tipo_doc, nro_doc, nombre, apellido, 
+						destino
+	FROM ((((((Transferencia transfer JOIN Transaccion_por_caja transcaja ON transfer.nro_trans = transcaja.nro_trans) 
+				JOIN Transaccion trans ON transcaja.nro_trans = trans.nro_trans)
+				JOIN Cliente_ca clienteca ON clienteca.nro_ca = transfer.origen AND clienteca.nro_cliente = transfer.nro_cliente)
+				JOIN Caja ca ON ca.cod_caja = transcaja.cod_caja)
+				JOIN Cliente cl ON cl.nro_cliente = transfer.nro_cliente)
+				JOIN caja_ahorro caahorro ON clienteca.nro_ca = caahorro.nro_ca));	
+				
+				
 #----------------------------------------------------------------------------------
 # Creacion de usuarios y asignacion de privilegios
 
@@ -407,7 +451,6 @@ GRANT ALL PRIVILEGES ON banco.* TO 'admin'@'localhost' WITH GRANT OPTION;
 /*----------------------USER EMPLEADO-------------------------*/
 
 /*DROP USER empleado;*/
-DROP USER ''@'localhost';
 CREATE USER 'empleado'@'%' IDENTIFIED BY 'empleado';
 
 /* Consultas que puede hacer el empleado: */
@@ -437,10 +480,3 @@ CREATE USER 'atm'@'%' IDENTIFIED BY 'atm';
 GRANT SELECT ON banco.Transaccion_por_caja TO 'atm'@'%';
 GRANT SELECT, UPDATE ON banco.Tarjeta TO 'atm'@'%';
 /*GRANT SELECT ON banco.trans_cajas_ahorro TO 'atm'@'%';*/
-
-
-
-
-
-
-
